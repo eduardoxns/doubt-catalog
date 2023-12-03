@@ -1,0 +1,3 @@
+serverless
+boto3
+flask
