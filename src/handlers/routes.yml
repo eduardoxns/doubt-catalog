@@ -1,0 +1,34 @@
+create_doubt:
+  handler: src/handlers/create_doubt.lambda_handler
+  role: arn:aws:iam::049747648193:role/LambdaDynamoCreateDoubt
+  events:
+    - http:
+        path: doubts
+        method: post
+
+read_doubt:
+  handler: src/handlers/read_doubt.lambda_handler
+  role: arn:aws:iam::049747648193:role/LambdaDynamoReadDoubt
+  events:
+    - http:
+        path: doubts
+        method: get
+    - http:
+        path: doubts/{id}
+        method: get
+
+update_doubt:
+  handler: src/handlers/update_doubt.lambda_handler
+  role: arn:aws:iam::049747648193:role/LambdaDynamoUpdateDoubt
+  events:
+    - http:
+        path: doubts/{id}
+        method: put
+
+delete_doubt:
+  handler: src/handlers/delete_doubt.lambda_handler
+  role: arn:aws:iam::049747648193:role/LambdaDynamoDeleteDoubt
+  events:
+    - http:
+        path: doubts/{id}
+        method: delete
