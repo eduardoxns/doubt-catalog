@@ -1,4 +1,8 @@
 import boto3
+import logging
+
+logger = logging.getLogger()
+logger.setLevel(logging.INFO)
 
 dynamodb = boto3.resource("dynamodb", region_name="sa-east-1")
 
@@ -24,6 +28,5 @@ def create_table():
         }
     )
 
-    table.meta.client.get_waiter('table_exists').wait(TableName=table_name)
-    logger.info(f'Table {table_name} created successfully')
-    
+    table.meta.client.get_waiter('table_exists').wait(TableName=table)
+    logger.info(f'Table {table} created successfully')

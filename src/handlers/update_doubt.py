@@ -1,2 +1,2 @@
-def lambda_handler(event, context)
-    print('test')
+def lambda_handler(event, context):
+    print("in progress...")
