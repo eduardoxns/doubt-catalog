@@ -5,10 +5,11 @@ logger = logging.getLogger()
 logger.setLevel(logging.INFO)
 
 dynamodb = boto3.resource("dynamodb", region_name="sa-east-1")
+table = dynamodb.Table("doubt_catalog")
 
 
 def create_table():
-    table = dynamodb.create_table(
+    table_create = dynamodb.create_table(
         TableName="doubt_catalog",
         KeySchema=[
             {
@@ -28,5 +29,9 @@ def create_table():
         }
     )
 
-    table.meta.client.get_waiter('table_exists').wait(TableName=table)
-    logger.info(f'Table {table} created successfully')
+    table_create.meta.client.get_waiter('table_exists').wait(TableName=table_create)
+    logger.info(f'Table {table_create} created successfully')
+
+
+if __name__ == "__main__":
+    create_table()

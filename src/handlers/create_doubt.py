@@ -1,19 +1,18 @@
-import uuid
 import json
+import uuid
 import logging
 from datetime import datetime
-from src.services.dynamodb import dynamodb
+from src.services.dynamodb import table
 
 logger = logging.getLogger()
 logger.setLevel(logging.INFO)
-
-table = dynamodb.Table("doubt_catalog")
 
 
 def lambda_handler(event, context):
     if 'body' not in event:
         return {
             'statusCode': 400,
+            'headers': {'Content-Type': 'application/json'},
             'body': json.dumps({'error': 'Request body is missing or empty'})
         }
 
@@ -29,4 +28,8 @@ def lambda_handler(event, context):
     }
     table.put_item(Item=item)
 
-    return True
+    return {
+        'statusCode': 200,
+        'headers': {'Content-Type': 'application/json'},
+        'body': json.dumps(item)
+    }
