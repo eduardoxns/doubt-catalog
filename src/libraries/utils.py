@@ -56,8 +56,9 @@ def response_500() -> dict:
 
 
 def client_error_response(ce) -> dict:
+    error_message = ce.response.get("Error", {}).get("Message", "Unknown Error")
     return {
         'statusCode': HTTP_STATUS_INTERNAL_SERVER_ERROR,
         'headers': HEADERS_JSON,
-        'body': json.dumps({'error': f'Internal Server Error: {ce.response["Error"]["Message"]}'})
+        'body': json.dumps({'error': f'Internal Server Error: {error_message}'})
     }

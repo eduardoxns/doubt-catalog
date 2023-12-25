@@ -1,8 +1,8 @@
 import json
 import logging
 from botocore.exceptions import ClientError
-from src.infra.dynamodb.dynamodb import dynamodb
-from src.utils.utils import response_200, response_400, response_500, client_error_response
+from infra.dynamodb.dynamodb import dynamodb
+from src.libraries.utils import response_200, response_400, response_500, client_error_response
 
 logger = logging.getLogger()
 logger.setLevel(logging.INFO)
@@ -23,7 +23,11 @@ def lambda_handler(event, context):
         return response_200(body)
 
     except ClientError as ce:
-        logger.exception(f'Error deleting doubt: {ce.response["Error"]["Message"]}')
+        if "Error" in ce.response:
+            error_message = ce.response["Error"].get("Message", "Unknown Error")
+            logger.exception(f'Error deleting doubt: {error_message}')
+        else:
+            logger.exception(f'Error deleting doubt: Unknown Error')
         return client_error_response(ce)
 
     except Exception as e:

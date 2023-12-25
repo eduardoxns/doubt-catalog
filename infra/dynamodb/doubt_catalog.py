@@ -3,12 +3,12 @@ from dynamodb import create_table
 
 logging.getLogger().setLevel(logging.INFO)
 
-_table_name = "doubt_catalog"
+__table_name__ = "doubt_catalog"
 
 
 def table_info():
     info = {
-        "TableName": _table_name,
+        "TableName": __table_name__,
         "KeySchema": [
             {
                 "AttributeName": "id",
@@ -30,5 +30,5 @@ def table_info():
 
 
 if __name__ == "__main__":
-    table_name = create_table(_table_name, table_info)
+    table_name = create_table(__table_name__, table_info)
     logging.info("Done!")

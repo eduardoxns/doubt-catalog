@@ -2,8 +2,8 @@ import json
 import logging
 from datetime import datetime
 from botocore.exceptions import ClientError
-from src.infra.dynamodb.dynamodb import dynamodb
-from src.utils.utils import decimal_default, verify_if_body_exist, response_200, response_404, response_500, client_error_response
+from infra.dynamodb.dynamodb import dynamodb
+from src.libraries.utils import decimal_default, verify_if_body_exist, response_200, response_404, response_500, client_error_response
 
 logger = logging.getLogger()
 logger.setLevel(logging.INFO)

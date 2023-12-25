@@ -1,8 +1,8 @@
 import json
 import logging
 from botocore.exceptions import ClientError
-from src.infra.dynamodb.dynamodb import dynamodb
-from src.utils.utils import decimal_default, response_200, response_400, response_404, response_500, client_error_response
+from infra.dynamodb.dynamodb import dynamodb
+from src.libraries.utils import decimal_default, response_200, response_400, response_404, response_500, client_error_response
 
 logger = logging.getLogger()
 logger.setLevel(logging.INFO)
@@ -28,7 +28,11 @@ def read_doubt(event):
         return response_200(body)
 
     except ClientError as ce:
-        logger.exception(f'Error reading doubt: {ce.response["Error"]["Message"]}')
+        if "Error" in ce.response:
+            error_message = ce.response["Error"].get("Message", "Unknown Error")
+            logger.exception(f'Error reading doubt: {error_message}')
+        else:
+            logger.exception(f'Error reading doubt: Unknown Error')
         return client_error_response(ce)
 
     except Exception as e:
@@ -49,8 +53,13 @@ def read_doubts(event):
         return response_200(body)
 
     except ClientError as ce:
-        logger.exception(f'Error reading doubts: {ce.response["Error"]["Message"]}')
+        if "Error" in ce.response:
+            error_message = ce.response["Error"].get("Message", "Unknown Error")
+            logger.exception(f'Error reading doubts: {error_message}')
+        else:
+            logger.exception(f'Error reading doubts: Unknown Error')
         return client_error_response(ce)
+
 
     except Exception as e:
         logger.exception(f'Unexpected error reading doubts: {e}')

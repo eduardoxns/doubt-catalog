@@ -3,8 +3,8 @@ import uuid
 import logging
 from datetime import datetime
 from botocore.exceptions import ClientError
-from src.infra.dynamodb.dynamodb import dynamodb
-from src.utils.utils import verify_if_body_exist, response_200, response_500, client_error_response
+from infra.dynamodb.dynamodb import dynamodb
+from src.libraries.utils import verify_if_body_exist, response_200, response_500, client_error_response
 
 logger = logging.getLogger()
 logger.setLevel(logging.INFO)
@@ -35,7 +35,11 @@ def create_doubt(event):
         return response_200(body)
 
     except ClientError as ce:
-        logger.exception(f'Error creating doubt: {ce.response["Error"]["Message"]}')
+        if "Error" in ce.response:
+            error_message = ce.response["Error"].get("Message", "Unknown Error")
+            logger.exception(f'Error creating doubt: {error_message}')
+        else:
+            logger.exception(f'Error creating doubt: Unknown Error')
         return client_error_response(ce)
 
     except Exception as e:
