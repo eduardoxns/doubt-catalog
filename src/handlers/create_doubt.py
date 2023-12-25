@@ -2,23 +2,18 @@ import json
 import uuid
 import logging
 from datetime import datetime
-from src.services.dynamodb import table
+from botocore.exceptions import ClientError
+from src.infra.dynamodb.dynamodb import dynamodb
+from src.utils.utils import verify_if_body_exist, response_200, response_500, client_error_response
 
 logger = logging.getLogger()
 logger.setLevel(logging.INFO)
 
+TABLE_NAME = 'doubt_catalog'
 
-def lambda_handler(event, context):
-    if 'body' not in event:
-        return {
-            'statusCode': 400,
-            'headers': {'Content-Type': 'application/json'},
-            'body': json.dumps({'error': 'Request body is missing or empty'})
-        }
 
-    data = json.loads(event.get("body"))
-
-    item = {
+def create_doubt_item(data):
+    return {
         'id': str(uuid.uuid1()),
         'title': data.get("title"),
         'description': data.get("description"),
@@ -26,10 +21,27 @@ def lambda_handler(event, context):
         'created_at': datetime.now().isoformat(),
         'updated_at': datetime.now().isoformat()
     }
-    table.put_item(Item=item)
 
-    return {
-        'statusCode': 200,
-        'headers': {'Content-Type': 'application/json'},
-        'body': json.dumps(item)
-    }
+
+def create_doubt(event):
+    verify_if_body_exist(event)
+
+    data = json.loads(event.get("body"))
+    item = create_doubt_item(data)
+
+    try:
+        dynamodb.Table(TABLE_NAME).put_item(Item=item)
+        body = json.dumps(item)
+        return response_200(body)
+
+    except ClientError as ce:
+        logger.exception(f'Error creating doubt: {ce.response["Error"]["Message"]}')
+        return client_error_response(ce)
+
+    except Exception as e:
+        logger.exception(f'Unexpected error creating doubt: {e}')
+        return response_500()
+
+
+def lambda_handler(event, context):
+    return create_doubt(event)
