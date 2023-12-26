@@ -1,5 +1,5 @@
 create_doubt:
-  handler: src/handlers/create_doubt.lambda_handler
+  handler: src/doubts/create_doubt.lambda_handler
   role: arn:aws:iam::049747648193:role/LambdaDynamoCreateDoubt
   events:
     - http:
@@ -7,7 +7,7 @@ create_doubt:
         method: post
 
 read_doubt:
-  handler: src/handlers/read_doubt.lambda_handler
+  handler: src/doubts/read_doubt.lambda_handler
   role: arn:aws:iam::049747648193:role/LambdaDynamoReadDoubt
   events:
     - http:
@@ -18,7 +18,7 @@ read_doubt:
         method: get
 
 update_doubt:
-  handler: src/handlers/update_doubt.lambda_handler
+  handler: src/doubts/update_doubt.lambda_handler
   role: arn:aws:iam::049747648193:role/LambdaDynamoUpdateDoubt
   events:
     - http:
@@ -26,7 +26,7 @@ update_doubt:
         method: put
 
 delete_doubt:
-  handler: src/handlers/delete_doubt.lambda_handler
+  handler: src/doubts/delete_doubt.lambda_handler
   role: arn:aws:iam::049747648193:role/LambdaDynamoDeleteDoubt
   events:
     - http:

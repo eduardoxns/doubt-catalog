@@ -17,4 +17,4 @@ provider:
   region: sa-east-1
 
 functions:
-  - ${file(src/handlers/routes.yml)}
+  - ${file(src/routes.yml)}

@@ -2,9 +2,7 @@ import json
 import uuid
 import unittest
 from unittest.mock import patch, MagicMock
-
 from botocore.exceptions import ClientError
-
 from src.doubts.create_doubt import create_doubt
 
 
@@ -25,18 +23,12 @@ class TestCreateDoubt(BaseTestCreateDoubt):
     def test_create_doubt_success(self):
         mock_put_item = MagicMock()
         self.mock_table.return_value.put_item = mock_put_item
-
-        event = self.generate_event(
-            body='{"title": "Test Doubt","description": "This is a test doubt"}'
-        )
+        event = self.generate_event(body='{"title": "Test Doubt","description": "This is a test doubt"}')
         response = create_doubt(event)
-
         self.assertEqual(response['statusCode'], 200)
-
         response_body = json.loads(response.get('body', '{}'))
         self.assertTrue(uuid.UUID(response_body.get('id', ''), version=4))
         response_body.pop('id', None)
-
         expected_body = {
             "title": "Test Doubt",
             "description": "This is a test doubt",
@@ -60,9 +52,7 @@ class TestCreateDoubt(BaseTestCreateDoubt):
     def test_create_doubt_client_error(self):
         mock_put_item = MagicMock(side_effect=ClientError({}, "operation_name"))
         self.mock_table.return_value.put_item = mock_put_item
-        event = self.generate_event(
-            body='{"title": "Test Doubt","description": "This is a test doubt"}'
-        )
+        event = self.generate_event(body='{"title": "Test Doubt","description": "This is a test doubt"}')
         response = create_doubt(event)
         expected_response = {
             'statusCode': 500,
@@ -74,9 +64,7 @@ class TestCreateDoubt(BaseTestCreateDoubt):
     def test_create_doubt_generic_error(self):
         mock_put_item = MagicMock(side_effect=Exception("Unexpected error"))
         self.mock_table.return_value.put_item = mock_put_item
-        event = self.generate_event(
-            body='{"title": "Test Doubt","description": "This is a test doubt"}'
-        )
+        event = self.generate_event(body='{"title": "Test Doubt","description": "This is a test doubt"}')
         response = create_doubt(event)
         expected_response = {
             'statusCode': 500,

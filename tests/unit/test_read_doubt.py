@@ -73,7 +73,7 @@ class TestReadDoubt(BaseTestReadDoubt):
         self.assertEqual(response, expected_response)
 
 
-class TestReadDoubts(BaseReadDoubtTest):
+class TestReadDoubts(BaseTestReadDoubt):
 
     def test_read_doubts_success(self):
         self.mock_table.return_value.scan.return_value = {

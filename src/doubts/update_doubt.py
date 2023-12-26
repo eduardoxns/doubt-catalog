@@ -3,7 +3,8 @@ import logging
 from datetime import datetime
 from botocore.exceptions import ClientError
 from infra.dynamodb.dynamodb import dynamodb
-from src.libraries.utils import decimal_default, verify_if_body_exist, response_200, response_404, response_500, client_error_response
+from src.libraries.utils import decimal_default, verify_if_body_exist, response_200, response_404, response_500, \
+    client_error_response, response_400
 
 logger = logging.getLogger()
 logger.setLevel(logging.INFO)
@@ -28,22 +29,30 @@ def lambda_handler(event, context):
     params = event.get("pathParameters")
     doubt_id = params.get("id") if params else None
 
+    if not doubt_id:
+        return response_400()
+
     verify_if_body_exist(event)
     data = json.loads(event.get("body"))
 
     try:
         response = dynamodb.Table(TABLE_NAME).update_item(**update_doubt_item(doubt_id, data))
         updated_item = response.get("Attributes")
+
+        if not updated_item:
+            return response_404()
+
         body = json.dumps(updated_item, default=decimal_default)
         return response_200(body)
 
-    except dynamodb.meta.client.exceptions.ResourceNotFoundException:
-        return response_404()
-
     except ClientError as ce:
-        logger.exception(f'Error updating doubt: {ce.response["Error"]["Message"]}')
+        if "Error" in ce.response:
+            error_message = ce.response["Error"].get("Message", "Unknown Error")
+            logger.error(f'Error updating doubt: {error_message}')
+        else:
+            logger.error(f'Error updating doubt: Unknown Error')
         return client_error_response(ce)
 
     except Exception as e:
-        logger.exception(f'Unexpected error updating doubt: {e}')
+        logger.error(f'Unexpected error updating doubt: {e}')
         return response_500()
