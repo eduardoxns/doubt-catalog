@@ -8,17 +8,16 @@ class BaseTestReadDoubt(unittest.TestCase):
 
     def setUp(self):
         self.mock_table = patch("src.doubts.read_doubt.dynamodb.Table").start()
-        self.mock_logger = patch("src.doubts.read_doubt.logger").start()
+        self.mock_read_item = self.mock_table.return_value.read_item
 
     def tearDown(self):
         patch.stopall()
 
     def generate_event(self, path_parameters=None, path=None):
-        event = {}
-        if path_parameters:
-            event["pathParameters"] = path_parameters
-        if path:
-            event["path"] = path
+        event = {
+            "pathParameters": path_parameters if path_parameters else None,
+            "path": path if path else None
+        }
         return event
 
 
@@ -42,7 +41,7 @@ class TestReadDoubt(BaseTestReadDoubt):
         expected_response = {
             'statusCode': 404,
             'headers': {'Content-Type': 'application/json'},
-            'body': '{"error": "Doubt not found"}'
+            'body': '{"error": "Not Found: Doubt does not exist!"}'
         }
         self.assertEqual(response, expected_response)
 

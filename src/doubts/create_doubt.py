@@ -4,7 +4,8 @@ import logging
 from datetime import datetime
 from botocore.exceptions import ClientError
 from infra.dynamodb.dynamodb import dynamodb
-from src.libraries.utils import verify_if_body_exist, response_200, response_500, client_error_response
+from src.libraries.exceptions import HttpResponses
+from src.libraries.utils import verify_if_body_exist, MissingBodyError
 
 logger = logging.getLogger()
 logger.setLevel(logging.INFO)
@@ -23,29 +24,23 @@ def create_doubt_item(data):
     }
 
 
-def create_doubt(event):
-    verify_if_body_exist(event)
-
+def lambda_handler(event, context):
     data = json.loads(event.get("body"))
-    item = create_doubt_item(data)
-
     try:
+        verify_if_body_exist(event)
+        item = create_doubt_item(data)
         dynamodb.Table(TABLE_NAME).put_item(Item=item)
         body = json.dumps(item)
-        return response_200(body)
+        return HttpResponses.http_response_200(body)
+
+    except MissingBodyError:
+        return HttpResponses.http_response_404("Request body not found!")
 
     except ClientError as ce:
-        if "Error" in ce.response:
-            error_message = ce.response["Error"].get("Message", "Unknown Error")
-            logger.exception(f'Error creating doubt: {error_message}')
-        else:
-            logger.exception(f'Error creating doubt: Unknown Error')
-        return client_error_response(ce)
+        error_message = ce.response.get("Error", {}).get("Message", "Unknown Error")
+        logger.exception(f'Error creating doubt: {error_message}')
+        return HttpResponses.http_client_error_response(ce)
 
     except Exception as e:
         logger.exception(f'Unexpected error creating doubt: {e}')
-        return response_500()
-
-
-def lambda_handler(event, context):
-    return create_doubt(event)
+        return HttpResponses.http_response_500()

@@ -3,8 +3,8 @@ import logging
 from datetime import datetime
 from botocore.exceptions import ClientError
 from infra.dynamodb.dynamodb import dynamodb
-from src.libraries.utils import decimal_default, verify_if_body_exist, response_200, response_404, response_500, \
-    client_error_response, response_400
+from src.libraries.exceptions import HttpResponses
+from src.libraries.utils import decimal_default, verify_if_body_exist, MissingBodyError
 
 logger = logging.getLogger()
 logger.setLevel(logging.INFO)
@@ -30,29 +30,27 @@ def lambda_handler(event, context):
     doubt_id = params.get("id") if params else None
 
     if not doubt_id:
-        return response_400()
-
-    verify_if_body_exist(event)
-    data = json.loads(event.get("body"))
+        return HttpResponses.http_response_400("Missing doubt_id in path parameters!")
 
     try:
+        data = json.loads(event.get("body"))
         response = dynamodb.Table(TABLE_NAME).update_item(**update_doubt_item(doubt_id, data))
-        updated_item = response.get("Attributes")
+        item = response.get("Attributes")
 
-        if not updated_item:
-            return response_404()
+        if not item:
+            return HttpResponses.http_response_404("Doubt does not exist!")
 
-        body = json.dumps(updated_item, default=decimal_default)
-        return response_200(body)
+        body = json.dumps(item, default=decimal_default)
+        return HttpResponses.http_response_200(body)
+
+    except MissingBodyError:
+        return HttpResponses.http_response_404("Request body not found!")
 
     except ClientError as ce:
-        if "Error" in ce.response:
-            error_message = ce.response["Error"].get("Message", "Unknown Error")
-            logger.error(f'Error updating doubt: {error_message}')
-        else:
-            logger.error(f'Error updating doubt: Unknown Error')
-        return client_error_response(ce)
+        error_message = ce.response.get("Error", {}).get("Message", "Unknown Error")
+        logger.exception(f'Error updating doubt: {error_message}')
+        return HttpResponses.http_client_error_response(ce)
 
     except Exception as e:
         logger.error(f'Unexpected error updating doubt: {e}')
-        return response_500()
+        return HttpResponses.http_response_500()

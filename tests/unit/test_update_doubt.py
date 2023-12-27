@@ -8,6 +8,7 @@ class BaseTestUpdateDoubt(unittest.TestCase):
 
     def setUp(self):
         self.mock_table = patch("src.doubts.update_doubt.dynamodb.Table").start()
+        self.mock_update_item = self.mock_table.return_value.update_item
 
     def tearDown(self):
         patch.stopall()
@@ -48,7 +49,7 @@ class TestUpdateDoubt(BaseTestUpdateDoubt):
         expected_response = {
             'statusCode': 404,
             'headers': {'Content-Type': 'application/json'},
-            'body': '{"error": "Doubt not found"}'
+            'body': '{"error": "Not Found: Doubt does not exist!"}'
         }
         self.assertEqual(response, expected_response)
 
@@ -58,7 +59,7 @@ class TestUpdateDoubt(BaseTestUpdateDoubt):
         expected_response = {
             'statusCode': 400,
             'headers': {'Content-Type': 'application/json'},
-            'body': '{"error": "Missing doubt_id in path parameters"}'
+            'body': '{"error": "Bad Request: Missing doubt_id in path parameters!"}'
         }
         self.assertEqual(response, expected_response)
 

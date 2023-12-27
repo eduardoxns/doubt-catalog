@@ -2,7 +2,8 @@ import json
 import logging
 from botocore.exceptions import ClientError
 from infra.dynamodb.dynamodb import dynamodb
-from src.libraries.utils import decimal_default, response_200, response_400, response_404, response_500, client_error_response
+from src.libraries.exceptions import HttpResponses
+from src.libraries.utils import decimal_default
 
 logger = logging.getLogger()
 logger.setLevel(logging.INFO)
@@ -15,29 +16,26 @@ def read_doubt(event):
     doubt_id = params.get("id") if params else None
 
     if doubt_id is None:
-        return response_400()
+        return HttpResponses.http_response_400("Missing doubt_id in path parameters!")
 
     try:
         response = dynamodb.Table(TABLE_NAME).get_item(Key={'id': doubt_id})
         item = response.get("Item")
 
         if not item:
-            return response_404()
+            return HttpResponses.http_response_404("Doubt does not exist!")
 
         body = json.dumps(item, default=decimal_default)
-        return response_200(body)
+        return HttpResponses.http_response_200(body)
 
     except ClientError as ce:
-        if "Error" in ce.response:
-            error_message = ce.response["Error"].get("Message", "Unknown Error")
-            logger.exception(f'Error reading doubt: {error_message}')
-        else:
-            logger.exception(f'Error reading doubt: Unknown Error')
-        return client_error_response(ce)
+        error_message = ce.response.get("Error", {}).get("Message", "Unknown Error")
+        logger.exception(f'Error creating doubt: {error_message}')
+        return HttpResponses.http_client_error_response(ce)
 
     except Exception as e:
         logger.exception(f'Unexpected error reading doubt: {e}')
-        return response_500()
+        return HttpResponses.http_response_500()
 
 
 def read_doubts(event):
@@ -50,20 +48,16 @@ def read_doubts(event):
         items = response.get("Items", [])
 
         body = json.dumps(items, default=decimal_default)
-        return response_200(body)
+        return HttpResponses.http_response_200(body)
 
     except ClientError as ce:
-        if "Error" in ce.response:
-            error_message = ce.response["Error"].get("Message", "Unknown Error")
-            logger.exception(f'Error reading doubts: {error_message}')
-        else:
-            logger.exception(f'Error reading doubts: Unknown Error')
-        return client_error_response(ce)
-
+        error_message = ce.response.get("Error", {}).get("Message", "Unknown Error")
+        logger.exception(f'Error reading doubts: {error_message}')
+        return HttpResponses.http_client_error_response(ce)
 
     except Exception as e:
         logger.exception(f'Unexpected error reading doubts: {e}')
-        return response_500()
+        return HttpResponses.http_response_500()
 
 
 def lambda_handler(event, context):

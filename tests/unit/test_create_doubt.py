@@ -3,13 +3,15 @@ import uuid
 import unittest
 from unittest.mock import patch, MagicMock
 from botocore.exceptions import ClientError
-from src.doubts.create_doubt import create_doubt
+from src.doubts.create_doubt import lambda_handler
+from src.libraries.utils import MissingBodyError
 
 
 class BaseTestCreateDoubt(unittest.TestCase):
 
     def setUp(self):
         self.mock_table = patch("src.doubts.create_doubt.dynamodb.Table").start()
+        self.mock_create_item = self.mock_table.return_value.create_item
 
     def tearDown(self):
         patch.stopall()
@@ -24,7 +26,7 @@ class TestCreateDoubt(BaseTestCreateDoubt):
         mock_put_item = MagicMock()
         self.mock_table.return_value.put_item = mock_put_item
         event = self.generate_event(body='{"title": "Test Doubt","description": "This is a test doubt"}')
-        response = create_doubt(event)
+        response = lambda_handler(event, context=None)
         self.assertEqual(response['statusCode'], 200)
         response_body = json.loads(response.get('body', '{}'))
         self.assertTrue(uuid.UUID(response_body.get('id', ''), version=4))
@@ -39,13 +41,13 @@ class TestCreateDoubt(BaseTestCreateDoubt):
         self.assertDictEqual(response_body, expected_body)
 
     def test_create_doubt_missing_body(self):
-        self.mock_table.return_value.put_item.side_effect = ValueError('Request body is missing or empty')
+        self.mock_table.return_value.put_item.side_effect = MissingBodyError("Request body is missing or empty")
         event = self.generate_event(body='{}')
-        response = create_doubt(event)
+        response = lambda_handler(event, context=None)
         expected_response = {
-            'statusCode': 500,
+            'statusCode': 404,
             'headers': {'Content-Type': 'application/json'},
-            'body': '{"error": "Internal Server Error"}'
+            'body': '{"error": "Not Found: Request body not found!"}'
         }
         self.assertEqual(response, expected_response)
 
@@ -53,7 +55,7 @@ class TestCreateDoubt(BaseTestCreateDoubt):
         mock_put_item = MagicMock(side_effect=ClientError({}, "operation_name"))
         self.mock_table.return_value.put_item = mock_put_item
         event = self.generate_event(body='{"title": "Test Doubt","description": "This is a test doubt"}')
-        response = create_doubt(event)
+        response = lambda_handler(event, context=None)
         expected_response = {
             'statusCode': 500,
             'headers': {'Content-Type': 'application/json'},
@@ -65,7 +67,7 @@ class TestCreateDoubt(BaseTestCreateDoubt):
         mock_put_item = MagicMock(side_effect=Exception("Unexpected error"))
         self.mock_table.return_value.put_item = mock_put_item
         event = self.generate_event(body='{"title": "Test Doubt","description": "This is a test doubt"}')
-        response = create_doubt(event)
+        response = lambda_handler(event, context=None)
         expected_response = {
             'statusCode': 500,
             'headers': {'Content-Type': 'application/json'},
