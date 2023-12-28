@@ -2,15 +2,13 @@ import os
 import boto3
 import logging
 
-dynamodb = boto3.resource("dynamodb")
-client = boto3.client("dynamodb")
-
-boto3.resource(
+dynamodb = boto3.resource(
     "dynamodb",
     region_name="sa-east-1",
     aws_access_key_id=os.getenv("AWS_ACCESS_KEY_ID"),
     aws_secret_access_key=os.getenv("AWS_SECRET_ACCESS_KEY"),
 )
+client = boto3.client("dynamodb")
 
 
 def verify_if_table_exists(table_name: str, dynamodb) -> bool:
