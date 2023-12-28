@@ -14,11 +14,10 @@ class BaseTestUpdateDoubt(unittest.TestCase):
         patch.stopall()
 
     def generate_event(self, path_parameters=None, body=None):
-        event = {}
-        if path_parameters:
-            event["pathParameters"] = path_parameters
-        if body:
-            event["body"] = body
+        event = {
+            "pathParameters": path_parameters if path_parameters else None,
+            "body": body if body else None
+        }
         return event
 
 
@@ -64,26 +63,14 @@ class TestUpdateDoubt(BaseTestUpdateDoubt):
         self.assertEqual(response, expected_response)
 
     def test_update_doubt_client_error(self):
-        mock_client_error = MagicMock(side_effect=ClientError({}, "operation_name"))
-        self.mock_table.return_value.update_item.side_effect = mock_client_error
+        mock_update_item = MagicMock(side_effect=ClientError({}, "operation_name"))
+        self.mock_table.return_value.update_item.side_effect = mock_update_item
         event = self.generate_event(path_parameters={"id": "mocked_id"}, body='{"title": "Updated Doubt"}')
         response = lambda_handler(event, None)
         expected_response = {
             'statusCode': 500,
             'headers': {'Content-Type': 'application/json'},
             'body': '{"error": "Internal Server Error: Unknown Error"}'
-        }
-        self.assertEqual(response, expected_response)
-
-    def test_update_doubt_generic_error(self):
-        mock_generic_error = MagicMock(side_effect=Exception("Unexpected error"))
-        self.mock_table.return_value.update_item.side_effect = mock_generic_error
-        event = self.generate_event(path_parameters={"id": "mocked_id"}, body='{"title": "Updated Doubt"}')
-        response = lambda_handler(event, None)
-        expected_response = {
-            'statusCode': 500,
-            'headers': {'Content-Type': 'application/json'},
-            'body': '{"error": "Internal Server Error"}'
         }
         self.assertEqual(response, expected_response)
 

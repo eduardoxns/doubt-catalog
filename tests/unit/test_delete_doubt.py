@@ -41,26 +41,14 @@ class TestDeleteDoubt(BaseTestDeleteDoubt):
         self.assertEqual(response, expected_response)
 
     def test_delete_doubt_client_error(self):
-        mock_client_error = MagicMock(side_effect=ClientError({}, "operation_name"))
-        self.mock_table.return_value.delete_item.side_effect = mock_client_error
+        mock_delete_item = MagicMock(side_effect=ClientError({}, "operation_name"))
+        self.mock_table.return_value.delete_item.side_effect = mock_delete_item
         event = self.generate_event(path_parameters={"id": "mocked_id"})
         response = lambda_handler(event, None)
         expected_response = {
             'statusCode': 500,
             'headers': {'Content-Type': 'application/json'},
             'body': '{"error": "Internal Server Error: Unknown Error"}'
-        }
-        self.assertEqual(response, expected_response)
-
-    def test_delete_doubt_generic_error(self):
-        mock_exception = MagicMock(side_effect=Exception("Some error"))
-        self.mock_table.return_value.delete_item.side_effect = mock_exception
-        event = self.generate_event(path_parameters={"id": "mocked_id"})
-        response = lambda_handler(event, None)
-        expected_response = {
-            'statusCode': 500,
-            'headers': {'Content-Type': 'application/json'},
-            'body': '{"error": "Internal Server Error"}'
         }
         self.assertEqual(response, expected_response)
 

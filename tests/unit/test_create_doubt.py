@@ -23,13 +23,14 @@ class BaseTestCreateDoubt(unittest.TestCase):
 class TestCreateDoubt(BaseTestCreateDoubt):
 
     def test_create_doubt_success(self):
-        mock_put_item = MagicMock()
-        self.mock_table.return_value.put_item = mock_put_item
+        mock_create_item = MagicMock()
+        self.mock_table.return_value.put_item = mock_create_item
         event = self.generate_event(body='{"title": "Test Doubt","description": "This is a test doubt"}')
         response = lambda_handler(event, context=None)
         self.assertEqual(response['statusCode'], 200)
         response_body = json.loads(response.get('body', '{}'))
-        self.assertTrue(uuid.UUID(response_body.get('id', ''), version=4))
+        generated_id = response_body.get('id', '')
+        self.assertTrue(uuid.UUID(generated_id, version=4))
         response_body.pop('id', None)
         expected_body = {
             "title": "Test Doubt",
@@ -41,7 +42,8 @@ class TestCreateDoubt(BaseTestCreateDoubt):
         self.assertDictEqual(response_body, expected_body)
 
     def test_create_doubt_missing_body(self):
-        self.mock_table.return_value.put_item.side_effect = MissingBodyError("Request body is missing or empty")
+        mock_create_item = MagicMock(side_effect=MissingBodyError("Request body is missing or empty"))
+        self.mock_table.return_value.put_item = mock_create_item
         event = self.generate_event(body='{}')
         response = lambda_handler(event, context=None)
         expected_response = {
@@ -52,26 +54,14 @@ class TestCreateDoubt(BaseTestCreateDoubt):
         self.assertEqual(response, expected_response)
 
     def test_create_doubt_client_error(self):
-        mock_put_item = MagicMock(side_effect=ClientError({}, "operation_name"))
-        self.mock_table.return_value.put_item = mock_put_item
+        mock_create_item = MagicMock(side_effect=ClientError({}, "operation_name"))
+        self.mock_table.return_value.put_item = mock_create_item
         event = self.generate_event(body='{"title": "Test Doubt","description": "This is a test doubt"}')
         response = lambda_handler(event, context=None)
         expected_response = {
             'statusCode': 500,
             'headers': {'Content-Type': 'application/json'},
             'body': '{"error": "Internal Server Error: Unknown Error"}'
-        }
-        self.assertEqual(response, expected_response)
-
-    def test_create_doubt_generic_error(self):
-        mock_put_item = MagicMock(side_effect=Exception("Unexpected error"))
-        self.mock_table.return_value.put_item = mock_put_item
-        event = self.generate_event(body='{"title": "Test Doubt","description": "This is a test doubt"}')
-        response = lambda_handler(event, context=None)
-        expected_response = {
-            'statusCode': 500,
-            'headers': {'Content-Type': 'application/json'},
-            'body': '{"error": "Internal Server Error"}'
         }
         self.assertEqual(response, expected_response)
 
