@@ -3,9 +3,10 @@ import uuid
 import unittest
 from unittest.mock import patch, MagicMock
 from botocore.exceptions import ClientError
+from moto import mock_dynamodb
+
 from src.doubts.create_doubt import lambda_handler
 from src.libraries.utils import MissingBodyError
-from moto import mock_dynamodb
 
 
 @mock_dynamodb
