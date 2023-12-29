@@ -24,8 +24,7 @@ jobs:
       - name: Install Dependencies
         run: pip install -r requirements.txt
 
-      - name: Set AWS region
-        run: export AWS_DEFAULT_REGION=sa-east-1
-        
       - name: Run Unit Tests
-        run: python -m unittest discover tests/unit
+        run: |
+          export AWS_DEFAULT_REGION=sa-east-1
+          python -m unittest discover tests/unit
