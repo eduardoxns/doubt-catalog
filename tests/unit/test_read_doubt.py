@@ -1,6 +1,7 @@
 import unittest
 from unittest.mock import patch, MagicMock
 from botocore.exceptions import ClientError
+
 from src.doubts.read_doubt import lambda_handler
 
 
@@ -26,14 +27,8 @@ class TestReadDoubts(BaseTestReadDoubt):
     def test_read_doubts_success(self):
         self.mock_table.return_value.scan.return_value = {
             "Items": [
-                {
-                    "id": "1",
-                    "title": "Doubt 1"
-                },
-                {
-                    "id": "2",
-                    "title": "Doubt 2"
-                }
+                {"id": "1", "title": "Doubt 1"},
+                {"id": "2", "title": "Doubt 2"}
             ]
         }
         event = self.generate_event(path="/doubts")

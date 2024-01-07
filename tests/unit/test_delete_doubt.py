@@ -1,6 +1,7 @@
 import unittest
 from unittest.mock import patch, MagicMock
 from botocore.exceptions import ClientError
+
 from src.doubts.delete_doubt import lambda_handler
 
 
