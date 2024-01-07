@@ -12,6 +12,35 @@ logger.setLevel(logging.INFO)
 TABLE_NAME = 'doubt_catalog'
 
 
+def read_answers(event):
+    params = event.get("pathParameters")
+    doubt_id = params.get("doubt_id") if params else None
+
+    if not doubt_id:
+        return HttpResponses.http_response_400("Missing doubt_id in path parameters!")
+
+    try:
+        response = dynamodb.Table(TABLE_NAME).get_item(Key={'id': doubt_id})
+        item = response.get("Item")
+
+        if not item:
+            return HttpResponses.http_response_404("Doubt does not exist!")
+
+        answers = item.get("answers", [])
+
+        body = json.dumps(answers, default=decimal_default)
+        return HttpResponses.http_response_200(body)
+
+    except ClientError as ce:
+        error_message = ce.response.get("Error", {}).get("Message", "Unknown Error")
+        logger.exception(f'Error reading doubt: {error_message}')
+        return HttpResponses.http_client_error_response(ce)
+
+    except Exception as e:
+        logger.exception(f'Unexpected error reading doubt: {e}')
+        return HttpResponses.http_response_500()
+
+
 def read_answer(event):
     params = event.get("pathParameters")
     doubt_id = params.get("doubt_id") if params else None
@@ -34,35 +63,6 @@ def read_answer(event):
             return HttpResponses.http_response_404("Answer does not exist!")
 
         body = json.dumps(specific_answer, default=decimal_default)
-        return HttpResponses.http_response_200(body)
-
-    except ClientError as ce:
-        error_message = ce.response.get("Error", {}).get("Message", "Unknown Error")
-        logger.exception(f'Error reading doubt: {error_message}')
-        return HttpResponses.http_client_error_response(ce)
-
-    except Exception as e:
-        logger.exception(f'Unexpected error reading doubt: {e}')
-        return HttpResponses.http_response_500()
-
-
-def read_answers(event):
-    params = event.get("pathParameters")
-    doubt_id = params.get("doubt_id") if params else None
-
-    if not doubt_id:
-        return HttpResponses.http_response_400("Missing doubt_id in path parameters!")
-
-    try:
-        response = dynamodb.Table(TABLE_NAME).get_item(Key={'id': doubt_id})
-        item = response.get("Item")
-
-        if not item:
-            return HttpResponses.http_response_404("Doubt does not exist!")
-
-        answers = item.get("answers", [])
-
-        body = json.dumps(answers, default=decimal_default)
         return HttpResponses.http_response_200(body)
 
     except ClientError as ce:

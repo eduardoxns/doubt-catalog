@@ -25,6 +25,4 @@ jobs:
         run: pip install -r requirements.txt
 
       - name: Run Unit Tests
-        run: |
-          export AWS_DEFAULT_REGION=sa-east-1
-          python -m unittest discover tests/unit
+        run: python -m unittest discover tests/unit
