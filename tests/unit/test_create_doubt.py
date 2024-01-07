@@ -3,20 +3,16 @@ import uuid
 import unittest
 from unittest.mock import patch, MagicMock
 from botocore.exceptions import ClientError
-from moto import mock_dynamodb
 
 from src.doubts.create_doubt import lambda_handler
 from src.libraries.utils import MissingBodyError
 
 
-@mock_dynamodb
 class BaseTestCreateDoubt(unittest.TestCase):
 
     def setUp(self):
-        self.mock_table_name = 'doubt_catalog'
-        self.mock_create_item = MagicMock()
         self.mock_table = patch("src.doubts.create_doubt.dynamodb.Table").start()
-        self.mock_table.return_value.put_item = self.mock_create_item
+        self.mock_create_item = self.mock_table.return_value.put_item
 
     def tearDown(self):
         patch.stopall()

@@ -30,7 +30,7 @@ class TestReadDoubt(BaseTestReadDoubt):
                 "title": "Test Doubt"
             }
         }
-        event = self.generate_event(path_parameters={"id": "mocked_id"})
+        event = self.generate_event(path_parameters={"doubt_id": "mocked_id"})
         response = read_doubt(event)
         expected_response = {
             'statusCode': 200,
@@ -41,7 +41,7 @@ class TestReadDoubt(BaseTestReadDoubt):
 
     def test_read_doubt_not_found(self):
         self.mock_table.return_value.get_item.return_value = {"Item": None}
-        event = self.generate_event(path_parameters={"id": "non_existent_id"})
+        event = self.generate_event(path_parameters={"doubt_id": "non_existent_id"})
         response = read_doubt(event)
         expected_response = {
             'statusCode': 404,
@@ -53,7 +53,7 @@ class TestReadDoubt(BaseTestReadDoubt):
     def test_read_doubt_client_error(self):
         mock_read_item = MagicMock(side_effect=ClientError({}, "operation_name"))
         self.mock_table.return_value.get_item.side_effect = mock_read_item
-        event = self.generate_event(path_parameters={"id": "mocked_id"})
+        event = self.generate_event(path_parameters={"doubt_id": "mocked_id"})
         response = read_doubt(event)
         expected_response = {
             'statusCode': 500,

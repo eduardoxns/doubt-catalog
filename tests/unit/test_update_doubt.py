@@ -32,7 +32,7 @@ class TestUpdateDoubt(BaseTestUpdateDoubt):
                 'title': 'Updated Doubt'
             }
         }
-        event = self.generate_event(path_parameters={"id": "mocked_id"}, body='{"title": "Updated Doubt"}')
+        event = self.generate_event(path_parameters={"doubt_id": "mocked_id"}, body='{"title": "Updated Doubt"}')
         response = lambda_handler(event, None)
         expected_response = {
             'statusCode': 200,
@@ -43,7 +43,7 @@ class TestUpdateDoubt(BaseTestUpdateDoubt):
 
     def test_update_doubt_not_found(self):
         self.mock_table.return_value.update_item.return_value = {'Attributes': None}
-        event = self.generate_event(path_parameters={"id": "non_existent_id"}, body='{"title": "Updated Doubt"}')
+        event = self.generate_event(path_parameters={"doubt_id": "non_existent_id"}, body='{"title": "Updated Doubt"}')
         response = lambda_handler(event, None)
         expected_response = {
             'statusCode': 404,
@@ -65,7 +65,7 @@ class TestUpdateDoubt(BaseTestUpdateDoubt):
     def test_update_doubt_client_error(self):
         mock_update_item = MagicMock(side_effect=ClientError({}, "operation_name"))
         self.mock_table.return_value.update_item.side_effect = mock_update_item
-        event = self.generate_event(path_parameters={"id": "mocked_id"}, body='{"title": "Updated Doubt"}')
+        event = self.generate_event(path_parameters={"doubt_id": "mocked_id"}, body='{"title": "Updated Doubt"}')
         response = lambda_handler(event, None)
         expected_response = {
             'statusCode': 500,
