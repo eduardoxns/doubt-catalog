@@ -22,15 +22,23 @@ The REST API to the example app is described below.
 
 ### Endpoints:
 
-* `POST - https://m1xcjzho6f.execute-api.sa-east-1.amazonaws.com/dev/doubts`: Create a new doubt.
-* `GET - https://m1xcjzho6f.execute-api.sa-east-1.amazonaws.com/dev/doubts`: Retrieve a list of doubts.
-* `GET - https://m1xcjzho6f.execute-api.sa-east-1.amazonaws.com/dev/doubts/{doubt_id}`: Get details of a specific doubt.
-* `PUT - https://m1xcjzho6f.execute-api.sa-east-1.amazonaws.com/dev/doubts/{doubt_id}`: Edit an existing doubt.
-* `DELETE - https://m1xcjzho6f.execute-api.sa-east-1.amazonaws.com/dev/doubts/{doubt_id}`: Delete a doubt.
-* `POST - https://m1xcjzho6f.execute-api.sa-east-1.amazonaws.com/dev/doubts/{doubt_id}/answers`: Add a new answer to a doubt.
-* `GET - https://m1xcjzho6f.execute-api.sa-east-1.amazonaws.com/dev/doubts/{doubt_id}/answers`: Retrieve answers associated with a doubt.
-* `GET - https://m1xcjzho6f.execute-api.sa-east-1.amazonaws.com/dev/doubts/{doubt_id}/answers/{answer_id}`: Get details of a specific answer.
-* `DELETE - https://m1xcjzho6f.execute-api.sa-east-1.amazonaws.com/dev/doubts/{doubt_id}/answers/{answer_id}`: Remove an answer from a doubt.
+`POST - https://m1xcjzho6f.execute-api.sa-east-1.amazonaws.com/dev/doubts`: Create a new doubt.
+
+`GET - https://m1xcjzho6f.execute-api.sa-east-1.amazonaws.com/dev/doubts`: Retrieve a list of doubts.
+
+`GET - https://m1xcjzho6f.execute-api.sa-east-1.amazonaws.com/dev/doubts/{doubt_id}`: Get details of a specific doubt.
+
+`PUT - https://m1xcjzho6f.execute-api.sa-east-1.amazonaws.com/dev/doubts/{doubt_id}`: Edit an existing doubt.
+
+`DELETE - https://m1xcjzho6f.execute-api.sa-east-1.amazonaws.com/dev/doubts/{doubt_id}`: Delete a doubt.
+
+`POST - https://m1xcjzho6f.execute-api.sa-east-1.amazonaws.com/dev/doubts/{doubt_id}/answers`: Add a new answer to a doubt.
+
+`GET - https://m1xcjzho6f.execute-api.sa-east-1.amazonaws.com/dev/doubts/{doubt_id}/answers`: Retrieve answers associated with a doubt.
+
+`GET - https://m1xcjzho6f.execute-api.sa-east-1.amazonaws.com/dev/doubts/{doubt_id}/answers/{answer_id}`: Get details of a specific answer.
+
+`DELETE - https://m1xcjzho6f.execute-api.sa-east-1.amazonaws.com/dev/doubts/{doubt_id}/answers/{answer_id}`: Remove an answer.
 
 ### Response Format:
 
