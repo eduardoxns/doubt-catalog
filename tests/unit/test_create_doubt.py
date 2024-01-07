@@ -40,7 +40,7 @@ class TestCreateDoubt(BaseTestCreateDoubt):
         expected_body = {
             "title": "Test Doubt",
             "description": "This is a test doubt",
-            "answers": 0,
+            "answers": [],
             "created_at": response_body.get('created_at'),
             "updated_at": response_body.get('updated_at')
         }

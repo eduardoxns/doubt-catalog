@@ -1,6 +1,7 @@
 import json
 import logging
 from botocore.exceptions import ClientError
+
 from infra.dynamodb.dynamodb import dynamodb
 from src.libraries.exceptions import HttpResponses
 
@@ -11,7 +12,8 @@ TABLE_NAME = 'doubt_catalog'
 
 
 def lambda_handler(event, context):
-    doubt_id = event.get("pathParameters", {}).get("id")
+    params = event.get("pathParameters")
+    doubt_id = params.get("doubt_id") if params else None
 
     if not doubt_id:
         return HttpResponses.http_response_400("Missing doubt_id in path parameters!")

@@ -14,7 +14,7 @@ read_doubt:
         path: doubts
         method: get
     - http:
-        path: doubts/{id}
+        path: doubts/{doubt_id}
         method: get
 
 update_doubt:
@@ -22,7 +22,7 @@ update_doubt:
   role: arn:aws:iam::049747648193:role/LambdaDynamoUpdateDoubt
   events:
     - http:
-        path: doubts/{id}
+        path: doubts/{doubt_id}
         method: put
 
 delete_doubt:
@@ -30,5 +30,32 @@ delete_doubt:
   role: arn:aws:iam::049747648193:role/LambdaDynamoDeleteDoubt
   events:
     - http:
-        path: doubts/{id}
+        path: doubts/{doubt_id}
+        method: delete
+
+create_answer:
+  handler: src/answers/create_answer.lambda_handler
+  role: arn:aws:iam::049747648193:role/LambdaDynamoCreateAnswer
+  events:
+    - http:
+        path: doubts/{doubt_id}/answers
+        method: post
+
+read_answer:
+  handler: src/answers/read_answer.lambda_handler
+  role: arn:aws:iam::049747648193:role/LambdaDynamoReadAnswer
+  events:
+    - http:
+        path: doubts/{doubt_id}/answers
+        method: get
+    - http:
+        path: doubts/{doubt_id}/answers/{answer_id}
+        method: get
+
+delete_answer:
+  handler: src/answers/delete_answer.lambda_handler
+  role: arn:aws:iam::049747648193:role/LambdaDynamoDeleteAnswer
+  events:
+    - http:
+        path: doubts/{doubt_id}/answers/{answer_id}
         method: delete

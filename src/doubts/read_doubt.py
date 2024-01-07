@@ -1,6 +1,7 @@
 import json
 import logging
 from botocore.exceptions import ClientError
+
 from infra.dynamodb.dynamodb import dynamodb
 from src.libraries.exceptions import HttpResponses
 from src.libraries.utils import decimal_default
@@ -13,7 +14,7 @@ TABLE_NAME = 'doubt_catalog'
 
 def read_doubt(event):
     params = event.get("pathParameters")
-    doubt_id = params.get("id") if params else None
+    doubt_id = params.get("doubt_id") if params else None
 
     if doubt_id is None:
         return HttpResponses.http_response_400("Missing doubt_id in path parameters!")

@@ -21,7 +21,7 @@ class BaseTestDeleteDoubt(unittest.TestCase):
 class TestDeleteDoubt(BaseTestDeleteDoubt):
 
     def test_delete_doubt_success(self):
-        event = self.generate_event(path_parameters={"id": "mocked_id"})
+        event = self.generate_event(path_parameters={"doubt_id": "mocked_id"})
         response = lambda_handler(event, None)
         expected_response = {
             'statusCode': 200,

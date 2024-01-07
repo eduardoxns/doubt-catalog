@@ -2,6 +2,7 @@ import json
 import logging
 from datetime import datetime
 from botocore.exceptions import ClientError
+
 from infra.dynamodb.dynamodb import dynamodb
 from src.libraries.exceptions import HttpResponses
 from src.libraries.utils import decimal_default, verify_if_body_exist, MissingBodyError
@@ -12,7 +13,7 @@ logger.setLevel(logging.INFO)
 TABLE_NAME = 'doubt_catalog'
 
 
-def update_doubt_item(doubt_id, data):
+def update_item(doubt_id, data):
     return {
         'Key': {'id': doubt_id},
         'UpdateExpression': 'SET title = :title, description = :description, updated_at = :updated_at',
@@ -27,14 +28,16 @@ def update_doubt_item(doubt_id, data):
 
 def lambda_handler(event, context):
     params = event.get("pathParameters")
-    doubt_id = params.get("id") if params else None
+    doubt_id = params.get("doubt_id") if params else None
 
     if not doubt_id:
         return HttpResponses.http_response_400("Missing doubt_id in path parameters!")
 
     try:
         data = json.loads(event.get("body"))
-        response = dynamodb.Table(TABLE_NAME).update_item(**update_doubt_item(doubt_id, data))
+        verify_if_body_exist(event)
+
+        response = dynamodb.Table(TABLE_NAME).update_item(**update_item(doubt_id, data))
         item = response.get("Attributes")
 
         if not item:
@@ -43,7 +46,7 @@ def lambda_handler(event, context):
         body = json.dumps(item, default=decimal_default)
         return HttpResponses.http_response_200(body)
 
-    except MissingBodyError:
+    except MissingBodyError as mbe:
         return HttpResponses.http_response_404("Request body not found!")
 
     except ClientError as ce:
