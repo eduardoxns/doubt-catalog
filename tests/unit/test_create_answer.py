@@ -30,7 +30,7 @@ class TestCreateAnswer(BaseTestCreateAnswer):
     def test_create_answer_success(self):
         mock_create_item = MagicMock()
         self.mock_table.return_value.put_item = mock_create_item
-        event = self.generate_event(path_parameters={"doubt_id": "mocked_id"}, body='{"answer": "Test Answer"}')
+        event = self.generate_event(path_parameters={"doubt_id": "mocked_doubt_id"}, body='{"answer": "Test Answer"}')
         response = lambda_handler(event, context=None)
         self.assertEqual(response['statusCode'], 200)
         response_body = json.loads(response.get('body', '{}'))
@@ -46,7 +46,7 @@ class TestCreateAnswer(BaseTestCreateAnswer):
     def test_create_answer_missing_body(self):
         mock_create_item = MagicMock(side_effect=MissingBodyError("Request body is missing or empty"))
         self.mock_table.return_value.put_item = mock_create_item
-        event = self.generate_event(path_parameters={"doubt_id": "mocked_id"}, body='{}')
+        event = self.generate_event(path_parameters={"doubt_id": "mocked_doubt_id"}, body='{}')
         response = lambda_handler(event, context=None)
         expected_response = {
             'statusCode': 404,
@@ -79,7 +79,7 @@ class TestCreateAnswer(BaseTestCreateAnswer):
     def test_create_answer_client_error(self):
         mock_create_item = MagicMock(side_effect=ClientError({}, "operation_name"))
         self.mock_table.return_value.put_item = mock_create_item
-        event = self.generate_event(path_parameters={"doubt_id": "mocked_id"}, body='{"answer": "Test Answer"}')
+        event = self.generate_event(path_parameters={"doubt_id": "mocked_doubt_id"}, body='{"answer": "Test Answer"}')
         response = lambda_handler(event, context=None)
         expected_response = {
             'statusCode': 500,

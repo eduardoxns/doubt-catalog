@@ -4,6 +4,7 @@ from botocore.exceptions import ClientError
 
 from infra.dynamodb.dynamodb import dynamodb
 from src.libraries.exceptions import HttpResponses
+from src.libraries.utils import reorder_json
 
 logger = logging.getLogger()
 logger.setLevel(logging.INFO)
@@ -19,8 +20,7 @@ def read_doubts(event):
         logger.info(f"result[Items]: {response['Items']}")
 
         items = response.get("Items", [])
-
-        body = json.dumps(items)
+        body = json.dumps(reorder_json([reorder_json(item) for item in items]))
         return HttpResponses.http_response_200(body)
 
     except ClientError as ce:
@@ -47,7 +47,7 @@ def read_doubt(event):
         if not item:
             return HttpResponses.http_response_404("Doubt does not exist!")
 
-        body = json.dumps(item)
+        body = json.dumps(reorder_json(item))
         return HttpResponses.http_response_200(body)
 
     except ClientError as ce:

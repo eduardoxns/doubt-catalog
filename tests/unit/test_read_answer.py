@@ -27,11 +27,12 @@ class TestReadAnswers(BaseTestReadAnswer):
     def test_read_answers_success(self):
         self.mock_table.return_value.get_item.return_value = {
             "Item": {
-                "id": "mocked_id",
+                "id": "mocked__doubt_id",
                 "answers": [{"id": "1", "answer": "Answer 1"}, {"id": "2", "answer": "Answer 2"}]
             }
         }
-        event = self.generate_event(path="/doubts/mocked_id/answers", path_parameters={"doubt_id": "mocked_id"})
+        event = self.generate_event(path="/doubts/mocked_doubt_id/answers",
+                                    path_parameters={"doubt_id": "mocked_doubt_id"})
         response = lambda_handler(event, context=None)
         expected_response = {
             'statusCode': 200,
@@ -41,7 +42,7 @@ class TestReadAnswers(BaseTestReadAnswer):
         self.assertEqual(response, expected_response)
 
     def test_read_answers_missing_doubt_id(self):
-        event = self.generate_event(path="/doubts/mocked_id/answers", path_parameters={"doubt_id": ""})
+        event = self.generate_event(path="/doubts/mocked_doubt_id/answers", path_parameters={"doubt_id": ""})
         response = lambda_handler(event, context=None)
         expected_response = {
             'statusCode': 400,
@@ -52,7 +53,8 @@ class TestReadAnswers(BaseTestReadAnswer):
 
     def test_read_answers_doubt_not_found(self):
         self.mock_table.return_value.get_item.return_value = {"Item": None}
-        event = self.generate_event(path="/doubts/mocked_id/answers", path_parameters={"doubt_id": "mocked_id"})
+        event = self.generate_event(path="/doubts/mocked_doubt_id/answers",
+                                    path_parameters={"doubt_id": "mocked_doubt_id"})
         response = lambda_handler(event, context=None)
         expected_response = {
             'statusCode': 404,
@@ -64,7 +66,8 @@ class TestReadAnswers(BaseTestReadAnswer):
     def test_read_answers_client_error(self):
         mock_read_item = MagicMock(side_effect=ClientError({}, "operation_name"))
         self.mock_table.return_value.get_item.side_effect = mock_read_item
-        event = self.generate_event(path="/doubts/mocked_id/answers", path_parameters={"doubt_id": "mocked_id"})
+        event = self.generate_event(path="/doubts/mocked_doubt_id/answers",
+                                    path_parameters={"doubt_id": "mocked_doubt_id"})
         response = lambda_handler(event, context=None)
         expected_response = {
             'statusCode': 500,

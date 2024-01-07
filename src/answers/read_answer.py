@@ -4,6 +4,7 @@ from botocore.exceptions import ClientError
 
 from infra.dynamodb.dynamodb import dynamodb
 from src.libraries.exceptions import HttpResponses
+from src.libraries.utils import reorder_json
 
 logger = logging.getLogger()
 logger.setLevel(logging.INFO)
@@ -24,7 +25,7 @@ def read_answers(event):
 
         answers = item.get("answers", [])
 
-        body = json.dumps(answers)
+        body = json.dumps(reorder_json([reorder_json(answer) for answer in answers], answer=True))
         return HttpResponses.http_response_200(body)
 
     except ClientError as ce:
@@ -58,7 +59,7 @@ def read_answer(event):
         if not specific_answer:
             return HttpResponses.http_response_404("Answer does not exist!")
 
-        body = json.dumps(specific_answer)
+        body = json.dumps(reorder_json(specific_answer, answer=True))
         return HttpResponses.http_response_200(body)
 
     except ClientError as ce:

@@ -58,16 +58,16 @@ class TestReadDoubt(BaseTestReadDoubt):
     def test_read_doubt_success(self):
         self.mock_table.return_value.get_item.return_value = {
             "Item": {
-                "id": "mocked_id",
+                "id": "mocked_doubt_id",
                 "title": "Test Doubt"
             }
         }
-        event = self.generate_event(path_parameters={"doubt_id": "mocked_id"})
+        event = self.generate_event(path_parameters={"doubt_id": "mocked_doubt_id"})
         response = lambda_handler(event, context=None)
         expected_response = {
             'statusCode': 200,
             'headers': {'Content-Type': 'application/json'},
-            'body': '{"id": "mocked_id", "title": "Test Doubt"}'
+            'body': '{"id": "mocked_doubt_id", "title": "Test Doubt"}'
         }
         self.assertEqual(response, expected_response)
 
@@ -85,7 +85,7 @@ class TestReadDoubt(BaseTestReadDoubt):
     def test_read_doubt_client_error(self):
         mock_read_item = MagicMock(side_effect=ClientError({}, "operation_name"))
         self.mock_table.return_value.get_item.side_effect = mock_read_item
-        event = self.generate_event(path_parameters={"doubt_id": "mocked_id"})
+        event = self.generate_event(path_parameters={"doubt_id": "mocked_doubt_id"})
         response = lambda_handler(event, context=None)
         expected_response = {
             'statusCode': 500,

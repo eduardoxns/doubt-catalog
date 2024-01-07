@@ -32,16 +32,16 @@ class TestIntegrationReadDoubt(unittest.TestCase):
     def test_read_doubt(self, mock_read_item):
         mock_read_item.return_value.get_item.return_value = {
             "Item": {
-                "id": "mocked_id",
+                "id": "mocked_doubt_id",
                 "title": "Test Doubt"
             }
         }
-        event = {"pathParameters": {"doubt_id": "mocked_id"}}
+        event = {"pathParameters": {"doubt_id": "mocked_doubt_id"}}
         response = lambda_handler(event, context=None)
         expected_response = {
             'statusCode': 200,
             'headers': {'Content-Type': 'application/json'},
-            'body': '{"id": "mocked_id", "title": "Test Doubt"}'
+            'body': '{"id": "mocked_doubt_id", "title": "Test Doubt"}'
         }
         self.assertEqual(response, expected_response)
 

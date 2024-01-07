@@ -29,16 +29,16 @@ class TestUpdateDoubt(BaseTestUpdateDoubt):
         self.mock_table.return_value.update_item = mock_update_item
         self.mock_table.return_value.update_item.return_value = {
             'Attributes': {
-                'id': 'mocked_id',
+                'id': 'mocked_doubt_id',
                 'title': 'Updated Doubt'
             }
         }
-        event = self.generate_event(path_parameters={"doubt_id": "mocked_id"}, body='{"title": "Updated Doubt"}')
+        event = self.generate_event(path_parameters={"doubt_id": "mocked_doubt_id"}, body='{"title": "Updated Doubt"}')
         response = lambda_handler(event, None)
         expected_response = {
             'statusCode': 200,
             'headers': {'Content-Type': 'application/json'},
-            'body': '{"id": "mocked_id", "title": "Updated Doubt"}'
+            'body': '{"id": "mocked_doubt_id", "title": "Updated Doubt"}'
         }
         self.assertEqual(response, expected_response)
 
@@ -66,7 +66,7 @@ class TestUpdateDoubt(BaseTestUpdateDoubt):
     def test_update_doubt_client_error(self):
         mock_update_item = MagicMock(side_effect=ClientError({}, "operation_name"))
         self.mock_table.return_value.update_item.side_effect = mock_update_item
-        event = self.generate_event(path_parameters={"doubt_id": "mocked_id"}, body='{"title": "Updated Doubt"}')
+        event = self.generate_event(path_parameters={"doubt_id": "mocked_doubt_id"}, body='{"title": "Updated Doubt"}')
         response = lambda_handler(event, None)
         expected_response = {
             'statusCode': 500,

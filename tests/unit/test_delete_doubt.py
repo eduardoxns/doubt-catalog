@@ -22,12 +22,12 @@ class BaseTestDeleteDoubt(unittest.TestCase):
 class TestDeleteDoubt(BaseTestDeleteDoubt):
 
     def test_delete_doubt_success(self):
-        event = self.generate_event(path_parameters={"doubt_id": "mocked_id"})
+        event = self.generate_event(path_parameters={"doubt_id": "mocked_doubt_id"})
         response = lambda_handler(event, None)
         expected_response = {
             'statusCode': 200,
             'headers': {'Content-Type': 'application/json'},
-            'body': '{"message": "Doubt mocked_id deleted successfully!"}'
+            'body': '{"message": "Doubt mocked_doubt_id deleted successfully!"}'
         }
         self.assertEqual(response, expected_response)
 
@@ -44,7 +44,7 @@ class TestDeleteDoubt(BaseTestDeleteDoubt):
     def test_delete_doubt_client_error(self):
         mock_delete_item = MagicMock(side_effect=ClientError({}, "operation_name"))
         self.mock_table.return_value.delete_item.side_effect = mock_delete_item
-        event = self.generate_event(path_parameters={"doubt_id": "mocked_id"})
+        event = self.generate_event(path_parameters={"doubt_id": "mocked_doubt_id"})
         response = lambda_handler(event, None)
         expected_response = {
             'statusCode': 500,

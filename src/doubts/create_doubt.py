@@ -6,7 +6,7 @@ from botocore.exceptions import ClientError
 
 from infra.dynamodb.dynamodb import dynamodb
 from src.libraries.exceptions import HttpResponses
-from src.libraries.utils import verify_if_body_exist, MissingBodyError
+from src.libraries.utils import MissingBodyError, verify_if_body_exist, reorder_json
 
 logger = logging.getLogger()
 logger.setLevel(logging.INFO)
@@ -33,7 +33,7 @@ def lambda_handler(event, context):
         item = create_item(data)
         dynamodb.Table(TABLE_NAME).put_item(Item=item)
 
-        body = json.dumps(item)
+        body = json.dumps(reorder_json(item))
         return HttpResponses.http_response_200(body)
 
     except MissingBodyError:
